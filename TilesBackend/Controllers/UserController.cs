@@ -19,7 +19,7 @@ namespace TilesBackendApI.Controllers
             }
 
             // Register a new user
-            [HttpPost("register")]
+            [HttpPost("/api/auth/register/")]
             public async Task<IActionResult> RegisterUser([FromBody] UserRequestDto dto)
             {
                 var result = await _userService.RegisterUserAsync(dto);
@@ -32,7 +32,7 @@ namespace TilesBackendApI.Controllers
             }
 
             // Get a list of users with pagination and optional search filter
-            [HttpGet]
+            [HttpGet("/api/auth/")]
             public async Task<IActionResult> GetUsers([FromQuery] string search = "", [FromQuery] int pageNo = 1, [FromQuery] int rowsPerPage = 10)
             {
                 var result = await _userService.GetUsersAsync(search, pageNo, rowsPerPage);
@@ -40,7 +40,7 @@ namespace TilesBackendApI.Controllers
             }
 
             // Get user by ID
-            [HttpGet("{id}")]
+            [HttpGet("/api/auth/{id}")]
             public async Task<IActionResult> GetUserById(Guid id)
             {
                 var user = await _userService.GetUserByIdAsync(id);
@@ -53,7 +53,7 @@ namespace TilesBackendApI.Controllers
             }
 
             // Edit an existing user by their ID
-            [HttpPut("{id}")]
+            [HttpPut("/api/auth/{id}")]
             public async Task<IActionResult> EditUser(Guid id, [FromBody] UserRequestDto dto)
             {
                 var result = await _userService.UpdateUserAsync(id, dto);
@@ -66,7 +66,7 @@ namespace TilesBackendApI.Controllers
             }
 
             // Delete a user by their ID
-            [HttpDelete("{id}")]
+            [HttpDelete("/api/auth/{id}")]
             public async Task<IActionResult> DeleteUser(Guid id)
             {
                 var result = await _userService.DeleteUserAsync(id);
@@ -79,7 +79,7 @@ namespace TilesBackendApI.Controllers
             }
 
             // User login with email and password
-            [HttpPost("login")]
+            [HttpPost("/api/auth/login")]
             public async Task<IActionResult> Login([FromBody] LoginDto dto)
             {
                 var result = await _userService.LoginAsync(dto);
@@ -92,7 +92,7 @@ namespace TilesBackendApI.Controllers
             }
 
             // Update user password
-            [HttpPut("update-password")]
+            [HttpPut("/api/auth/updatePassword")]
             public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDto dto)
             {
                 var result = await _userService.UpdatePasswordAsync(dto);
@@ -105,7 +105,7 @@ namespace TilesBackendApI.Controllers
             }
 
             // Forgot password - sends an OTP to the user's email
-            [HttpPost("forgot-password")]
+            [HttpPost("/api/forgot/forgotPasswordEmail")]
             public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
             {
                 var result = await _userService.ForgotPasswordAsync(dto.Email);
@@ -118,7 +118,7 @@ namespace TilesBackendApI.Controllers
             }
 
             // Verify OTP sent for password reset
-            [HttpPost("verify-otp")]
+            [HttpPost("/api/forgot/verifyOtp")]
             public async Task<IActionResult> VerifyOtp([FromBody] OtpVerifyDto dto)
             {
                 var result = await _userService.VerifyOtpAsync(dto.Email, dto.Otp);

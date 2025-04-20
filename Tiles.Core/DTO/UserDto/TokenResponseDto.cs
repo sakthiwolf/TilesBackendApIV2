@@ -9,6 +9,6 @@ namespace Tiles.Core.DTO.UserDto
     public class TokenResponseDto
     {
         public string Token { get; set; } = string.Empty;
-        public UserResponseDto User { get; set; } = new UserResponseDto();
+        public UserResponseDto userData { get; set; } = new UserResponseDto();
     }
 }

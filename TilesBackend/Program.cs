@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Tiles.Core.Domain.RepositroyContracts;
+using Tiles.Core.ServiceContracts.UserManagement.Application.Interfaces;
 using Tiles.Core.ServiceContracts;
 using Tiles.Core.Services;
-using Tiles.Core.Domain.RepositroyContracts;
-using Tiles.Infrastructure.Repositories;
 using Tiles.Infrastructure.data;
-using Tiles.Core.ServiceContracts.UserManagement.Application.Interfaces; // Add for IUserService
-
+using Tiles.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Enable CORS to allow requests from your React app
 builder.Services.AddCors(options =>
 {
@@ -16,7 +16,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:5173") // React app URL
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials(); // Allow credentials (cookies, authorization headers)
     });
 });
 
@@ -56,6 +57,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowReactApp"); // Make sure this is before UseAuthorization
 app.UseHttpsRedirection();
 app.UseAuthorization();
 

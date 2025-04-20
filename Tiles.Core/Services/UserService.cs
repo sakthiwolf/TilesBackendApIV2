@@ -86,7 +86,7 @@ public class UserService : IUserService
         return ServiceResult<TokenResponseDto>.CreateSuccess(new TokenResponseDto
         {
             Token = token,
-            User = userDto
+            userData = userDto
         }, "Login successful.");
     }
 

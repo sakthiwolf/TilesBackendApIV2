@@ -1,22 +1,21 @@
-# Stage 1: Build
+# Use the .NET SDK image to build the application
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy the .csproj and restore dependencies
-COPY TilesApi/TilesApi.csproj TilesApi/
-RUN dotnet restore TilesApi/TilesApi.csproj
+# Copy and restore the project
+COPY ["TilesBackendApI.csproj", "./"]
+RUN dotnet restore "TilesBackendApI.csproj"
 
-# Copy the full source code and publish
+# Copy the rest of the files and build
 COPY . .
-RUN dotnet publish TilesApi/TilesApi.csproj -c Release -o /app/publish
+RUN dotnet build "TilesBackendApI.csproj" -c Release -o /app/build
 
-# Stage 2: Production image
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+# Publish the app
+FROM build AS publish
+RUN dotnet publish "TilesBackendApI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Final runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
-COPY --from=build /app/publish .
-
-# Expose default HTTP port
-EXPOSE 80
-
-# Run the application
-ENTRYPOINT ["dotnet", "TilesApi.dll"]
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "TilesBackendApI.dll"]

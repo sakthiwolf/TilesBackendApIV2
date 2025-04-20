@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: dotnet-webapi
+    env: docker
+    repo: https://github.com/sakthiwolf/TilesBackedendApI.git
+    branch: main
+    dockerfilePath: ./Dockerfile
+    rootDir: .   
+    plan: free
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        value: Data Source=(localdb)\\ProjectModels;Initial Catalog=UserTest;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi SubnetFailover=False
+
+      - key: EmailSettings__SmtpServer
+        value: smtp.gmail.com
+      - key: EmailSettings__Port
+        value: 587
+      - key: EmailSettings__Email
+        value: sakthiwolf1999@gmail.com
+      - key: EmailSettings__Password
+        value: umpyinjhxoeegvik
