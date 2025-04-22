@@ -21,56 +21,56 @@ public class UserService : IUserService
     }
 
     // Registers a new user with a temporary password and sends a welcome email
-    public async Task<ServiceResult> RegisterUserAsync(UserRequestDto dto)
+   public async Task<ServiceResult> RegisterUserAsync(UserRequestDto dto)
+{
+    try
     {
-        try
+        // Check if email is already registered
+        var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
+        if (existingUser != null)
+            return ServiceResult.CreateFailure("User already exists");
+
+        // Generate and hash temporary password
+        var tempPassword = GenerateTemporaryPassword();
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(tempPassword);
+
+        // Generate unique serial number
+        var serialNumber = await _userRepository.GetNextSerialNumberAsync();
+
+        // Create new user entity
+        var user = new User
         {
-            // Check if email is already registered
-            var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
-            if (existingUser != null)
-                return ServiceResult.CreateFailure("User already exists");
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            Email = dto.Email,
+            Designation = dto.Designation,
+            Phone = dto.Phone,
+            IsActive = dto.IsActive,
+            SerialNumber = serialNumber,
+            PasswordHash = hashedPassword,
+            IsFirst = true // Indicates first-time login
+        };
 
-            // Generate and hash temporary password
-            var tempPassword = GenerateTemporaryPassword();
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(tempPassword);
+        await _userRepository.AddAsync(user);
 
-            // Generate unique serial number
-            var serialNumber = await _userRepository.GetNextSerialNumberAsync();
-
-            // Create new user entity
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Name = dto.Name,
-                Email = dto.Email,
-                Designation = dto.Designation,
-                Phone = dto.Phone,
-                IsActive = dto.IsActive,
-                SerialNumber = serialNumber,
-                PasswordHash = hashedPassword,
-                IsFirst = true // Indicates first-time login
-            };
-
-            await _userRepository.AddAsync(user);
-
-            // Compose welcome email with temp password
-            var htmlContent = $@"
+        // Compose welcome email with temp password
+        var htmlContent = $@"
         <p>Hello {dto.Name},</p>
         <p>Your temporary password is: <b>{tempPassword}</b></p>
         <p>Click <a href=""https://localhost:5173"">here</a> to log in.</p>";
 
-            await SendEmailAsync(dto.Email, dto.Name, "Welcome! Set up your password", htmlContent);
+        await SendEmailAsync(dto.Email, dto.Name, "Welcome! Set up your password", htmlContent);
 
-            return ServiceResult.CreateSuccess("User registered successfully");
-        }
-        catch (Exception ex)
-        {
-            // Log the error details for debugging (ensure you have a logger injected into the service)
-            //_logger.LogError(ex, "Error occurred while registering user.");
-
-            return ServiceResult.CreateFailure("An unexpected error occurred. Please try again later.");
-        }
+        return ServiceResult.CreateSuccess("User registered successfully");
     }
+    catch (Exception ex)
+    {
+        //// Log the error details for debugging (ensure you have a logger injected into the service)
+        //_logger.LogError(ex, "Error occurred while registering user.");
+        
+        return ServiceResult.CreateFailure("An unexpected error occurred. Please try again later.");
+    }
+}
 
 
     // Authenticates user and generates token (stubbed)

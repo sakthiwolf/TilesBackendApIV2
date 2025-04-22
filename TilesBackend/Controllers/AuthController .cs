@@ -15,27 +15,27 @@ namespace TilesBackendApI.Controllers
             _userService = userService;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> RegisterUser([FromBody] UserRequestDto dto)
-        {
-            // Validate the model
-            if (!ModelState.IsValid)
-            {
-                // Collect validation error messages
-                var errors = ModelState.Values.SelectMany(v => v.Errors)
-                                               .Select(e => e.ErrorMessage)
-                                               .ToList();
+      [HttpPost("register")]
+public async Task<IActionResult> RegisterUser([FromBody] UserRequestDto dto)
+{
+    // Validate the model
+    if (!ModelState.IsValid)
+    {
+        // Collect validation error messages
+        var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                       .Select(e => e.ErrorMessage)
+                                       .ToList();
+        
+        // Return validation errors
+        return BadRequest(new { msg = string.Join(", ", errors) });
+    }
 
-                // Return validation errors
-                return BadRequest(new { msg = string.Join(", ", errors) });
-            }
+    var result = await _userService.RegisterUserAsync(dto);
+    if (!result.Success)
+        return BadRequest(new { msg = result.Message });
 
-            var result = await _userService.RegisterUserAsync(dto);
-            if (!result.Success)
-                return BadRequest(new { msg = result.Message });
-
-            return Created("", new { msg = result.Message });
-        }
+    return Created("", new { msg = result.Message });
+}
 
 
         [HttpGet]
